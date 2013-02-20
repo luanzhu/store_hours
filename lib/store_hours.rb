@@ -1,7 +1,13 @@
-
+require 'parslet'
 
 require "store_hours/version"
+require "store_hours/text_input_parser"
 
-class StoreHours
-  # Your code goes here...
+module StoreHours
+  class StoreHours
+    def parse(s)
+      parser = TextInputParser.new
+      parser.parse(s)
+    end
+  end
 end
