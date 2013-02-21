@@ -6,10 +6,10 @@ module StoreHours
     rule(:sep)      { str('-') }
     rule(:colon)    { str(':') }
     rule(:comma)    { str(',') }
-    rule(:ampm)     { str('AM') | str('PM') }
+    rule(:ampm)     { str('am') | str('pm') }
     rule(:closed)   { str('closed') }
 
-    rule(:day)      { str('Mon') | str('Tue') | str('Wed') | str('Thu') | str('Fri') | str('Sat') | str('Sun') }
+    rule(:day)      { str('mon') | str('tue') | str('wed') | str('thu') | str('fri') | str('sat') | str('sun') }
 
     rule(:range)    { day.as(:day_from) >> space >> sep >> space >> day.as(:day_to) }
 
