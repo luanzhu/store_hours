@@ -15,7 +15,8 @@ module StoreHours
 
     rule(:left)     { range.as(:day_range) | day.as(:day_single) }
 
-    rule(:time)     { match('[0-9]').repeat(1,2) >> colon >> match('[0-9]').repeat(2) >> ampm }
+    rule(:minutes)  { colon >> match('[0-9]').repeat(1,2) }
+    rule(:time)     { match('[0-9]').repeat(1,2) >> minutes.maybe >> ampm }
     rule(:trange)   { time.as(:time_from) >> space >> sep >> space >> time.as(:time_to) >> space >> comma.maybe >> space }
     rule(:right)    { trange.repeat(1).as(:time_range) | (closed.as(:closed) >> space) }
 
