@@ -9,14 +9,14 @@ module StoreHours
     rule(:ampm)     { str('am') | str('pm') }
     rule(:closed)   { str('closed') }
 
-    rule(:day)      { str('mon') | str('tue') | str('wed') | str('thu') | str('fri') | str('sat') | str('sun') }
+    rule(:day)      { (str('mon') | str('tue') | str('wed') | str('thu') | str('fri') | str('sat') | str('sun')).as(:day) }
 
     rule(:range)    { day.as(:day_from) >> space >> sep >> space >> day.as(:day_to) }
 
     rule(:left)     { range.as(:day_range) | day.as(:day_single) }
 
-    rule(:minutes)  { colon >> match('[0-9]').repeat(1,2) }
-    rule(:time)     { match('[0-9]').repeat(1,2) >> minutes.maybe >> ampm }
+    rule(:minutes)  { colon >> match('[0-9]').repeat(1,2).as(:minute) }
+    rule(:time)     { match('[0-9]').repeat(1,2).as(:hour) >> minutes.maybe >> ampm.as(:ampm) }
     rule(:trange)   { time.as(:time_from) >> space >> sep >> space >> time.as(:time_to) >> space >> comma.maybe >> space }
     rule(:right)    { trange.repeat(1).as(:time_range) | (closed.as(:closed) >> space) }
 
