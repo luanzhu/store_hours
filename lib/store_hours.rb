@@ -43,7 +43,7 @@ module StoreHours
 
           line[k].each_with_index do |h, index|
             text += ', ' if index > 0
-            if h.first == 0 and h.last == 0
+            if h.first == -1 and h.last == -1
               text += "closed"
             elsif
               text += to_time_str(h.first) + " - " + to_time_str(h.last)
@@ -57,7 +57,22 @@ module StoreHours
     end
 
     def is_open?(t)
+      @hours.each do |days|
+        # days in the format of range(wday..wday) => [range(minutes..minutes),...]
+        # only one key in each days hashtable
+        k_days = days.keys.first
+        if k_days.include?(t.wday == 0 ? 7 : t.wday)
+          days[k_days].each do |min_range|
+            minutes = t.hour * 60 + t.min
 
+            if min_range.include?(minutes)
+              return true
+            end
+          end
+        end
+      end
+
+      return false
     end
 
     private
