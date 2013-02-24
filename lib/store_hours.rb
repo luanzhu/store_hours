@@ -13,14 +13,24 @@ module StoreHours
     end
 
     def from_text(text)
-      # Will raise Parslet::ParseFailed error if text cannot be parsed
+      # Will false if text cannot be parsed
       #
       #
-      throw ArgumentError.new('Input text cannot be nil') if text == nil
+      text = '' if text == nil
+      result = true
 
-      tree = TextInputParser.new.parse(text.strip.downcase)
+      begin
+        tree = TextInputParser.new.parse(text.strip.downcase)
 
-      @hours = TreeTransformer.new.apply(tree)
+        @hours = TreeTransformer.new.apply(tree)
+
+        result = true
+      rescue Exception => e
+        puts e.message
+        result = false
+      end
+
+      result
     end
 
     def to_text
@@ -44,6 +54,10 @@ module StoreHours
       end
 
       text.strip
+    end
+
+    def is_open?(t)
+
     end
 
     private
