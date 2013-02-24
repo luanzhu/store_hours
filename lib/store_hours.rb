@@ -8,10 +8,12 @@ require "json"
 
 module StoreHours
   class StoreHours
-    @hours = []
+    def initialize
+      @hours = []
+    end
 
     def from_text(text)
-      # Will raise Parslet::ParseFailed error if text is not in right format
+      # Will raise Parslet::ParseFailed error if text cannot be parsed
       #
       #
       throw ArgumentError.new('Input text cannot be nil') if text == nil
@@ -29,10 +31,11 @@ module StoreHours
           text += "-" + NUM_TO_WEEKDAY[k.last].to_s if k.first != k.last
           text += ": "
 
-          line[k].each do |h|
-            if h == 0
+          line[k].each_with_index do |h, index|
+            text += ', ' if index > 0
+            if h.first == 0 and h.last == 0
               text += "closed"
-            elsif h.class == Range
+            elsif
               text += to_time_str(h.first) + " - " + to_time_str(h.last)
             end
           end
@@ -40,15 +43,7 @@ module StoreHours
         end
       end
 
-      text
-    end
-
-    def to_json
-      @hours.to_json
-    end
-
-    def from_json(text)
-      @hours = JSON.parse(text)
+      text.strip
     end
 
     private

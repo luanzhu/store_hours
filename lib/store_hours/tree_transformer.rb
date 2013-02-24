@@ -15,7 +15,7 @@ module StoreHours
     rule(:day_single => simple(:x)) { x..x }
     rule(:day_range => {:day_from => simple(:f), :day_to => simple(:t)}) { f..t }
     rule(:line_left => simple(:d), :line_right => sequence(:t))  { { d => t} }
-    rule(:line_left => simple(:d), :line_right => simple(:c)) { {d => 0..0} }
+    rule(:line_left => simple(:d), :line_right => simple(:c)) { {d => [0..0]} }  #for "closed" days
     rule(:lines => subtree(:x)) { x }
   end
 end
