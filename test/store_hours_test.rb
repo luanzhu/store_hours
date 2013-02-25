@@ -61,4 +61,23 @@ describe StoreHours::StoreHours do
     h.is_open?(t).must_equal false
   end
 
+  it "should work with stores what open after the midnight" do
+    text = "Mon-Sun: 12:30AM-10PM"
+    h = StoreHours::StoreHours.new
+    r = h.from_text(text)
+
+    r.must_equal true
+
+    t = Time.new(2013, 2, 24, 0, 0) #2013 Feb 24 12:00AM
+    h.is_open?(t).must_equal false
+    t = Time.new(2013, 2, 24, 0, 15) # 2013 Feb 24, 12:15AM
+    h.is_open?(t).must_equal false
+    t = Time.new(2013, 2, 24, 0, 30) #2013 Feb 24, 12:30AM
+    h.is_open?(t).must_equal true
+    t = Time.new(2013, 2, 24, 22, 0) #2013 Feb 24, 10:00PM
+    h.is_open?(t).must_equal true
+    t = Time.new(2013, 2, 24, 22, 1) #2013 Feb 24, 10:01PM
+    h.is_open?(t).must_equal false
+  end
+
 end

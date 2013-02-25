@@ -2,6 +2,15 @@ require 'parslet'
 
 module StoreHours
   class TextInputParser < Parslet::Parser
+    # Parser definition for store hours.
+    #
+    # Examples of valid strings:
+    #   mon: 10:00am - 5:00pm
+    #   mon-fri: 10am-5pm
+    #   sat - sun: closed
+    #   sun : closed
+    #
+    #
     rule(:space)    { match('\s').repeat }
     rule(:sep)      { str('-') }
     rule(:colon)    { str(':') }
