@@ -1,16 +1,31 @@
 require 'parslet'
 
 module StoreHours
+  # Parser definition for store hours.
+  #
+  # A valid input includes one or more entries of durations separated by one or more white spaces.
+  #
+  # This parser will only takes lower cases.  However,
+  #
+  # Each entry has two parts: (1)week day or week days, and (2) one or more time periods when the
+  # store is open, or closed for the days the store closes.
+  #
+  # Examples of valid entries:
+  #   mon: 10:00am - 5:00pm
+  #   mon: 8:00am-12:00pm, 1pm-5pm
+  #   mon: 8:00am-12:00pm 1pm-5pm
+  #   mon-fri : 10am-5pm
+  #   sat - sun: closed
+  #   sun : closed
+  #
+  # Examples of invalid entries:
+  #   mon  10am - 5pm           # colon(:) after week day(s) is required
+  #   mon fri: 10am - 5pm       # dash(-) between two days is required
+  #   mon-fri: 10:am - 5pm      # minute component for time is required when the colon(:) is present
+  #   mon-fri: 10 am - 5 pm     # no space is allowed between time digits and am/pm
+  #   mon : 10am - 17           # standard time format (with am or pm) is required
+  #   sat-sun: 10am-1pm closed  # closed can only be used with other time periods
   class TextInputParser < Parslet::Parser
-    # Parser definition for store hours.
-    #
-    # Examples of valid strings:
-    #   mon: 10:00am - 5:00pm
-    #   mon-fri: 10am-5pm
-    #   sat - sun: closed
-    #   sun : closed
-    #
-    #
     rule(:space)    { match('\s').repeat }
     rule(:sep)      { str('-') }
     rule(:colon)    { str(':') }

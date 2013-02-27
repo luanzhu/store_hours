@@ -1,9 +1,6 @@
 require 'minitest/spec'
 require 'minitest/autorun'
 
-require "minitest/reporters"
-MiniTest::Reporters.use!
-
 require 'store_hours'
 
 
@@ -24,12 +21,23 @@ describe StoreHours::StoreHours do
     h.to_text.must_equal "Mon-Thu: 9:00AM - 5:00PM, 6:00PM - 9:00PM\nFri: 9:00AM - 10:00PM\nSun: closed"
   end
 
-  it "should return false for invalid text" do
-    text = "M-T 9:00am-5pm"
+  it "should return true for valid text" do
     h = StoreHours::StoreHours.new
-    r = h.from_text(text)
+    text = "mon: 10:00am - 5:00pm mon-fri : 10am-5pm sat - sun: closed sun : closed Sat: 10am - 3:30pm 5pm-11pm"
 
-    r.must_equal false
+    h.from_text(text).must_equal true
+  end
+
+  it "should return false for invalid text" do
+    h = StoreHours::StoreHours.new
+
+    texts = ["M-T 9:00am-5pm", "mon  10am - 5pm", "mon-fri: 10:am - 5pm", "mon-fri: 10 am - 5 pm",  "mon : 10am - 17",
+             "sat-sun: 10am-1pm closed", "sat-sun:  closed  10am-1pm", "mon fri: 10am - 5pm"
+    ]
+
+    texts.each do |t|
+      h.from_text(t).must_equal false
+    end
   end
 
   it "should check whether the store is open for a time object" do

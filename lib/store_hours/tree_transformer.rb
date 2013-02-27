@@ -3,8 +3,6 @@ require 'parslet'
 require_relative 'constants'
 
 module StoreHours
-
-
   class TreeTransformer < Parslet::Transform
     rule(:hour => simple(:h), :ampm => simple(:ap)) { |dic|
       convert_time_input_to_minutes(dic[:h].to_i, 0, dic[:ap].to_sym)
