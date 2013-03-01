@@ -12,7 +12,7 @@ module StoreHours
   #
   # Examples of valid entries:
   #   mon: 10:00am - 5:00pm
-  #   mon: 8:00am-12:00pm, 1pm-5pm
+  #   mon: 8:00am-12:00pm, 1pm-5pm   #time periods can be separated by comma(,) or space
   #   mon: 8:00am-12:00pm 1pm-5pm
   #   mon-fri : 10am-5pm
   #   sat - sun: closed
@@ -25,6 +25,7 @@ module StoreHours
   #   mon-fri: 10 am - 5 pm     # no space is allowed between time digits and am/pm
   #   mon : 10am - 17           # standard time format (with am or pm) is required
   #   sat-sun: 10am-1pm closed  # closed can only be used with other time periods
+  #
   class TextInputParser < Parslet::Parser
     rule(:space)    { match('\s').repeat }
     rule(:sep)      { str('-') }
