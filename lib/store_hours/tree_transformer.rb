@@ -16,36 +16,23 @@ module StoreHours
   # Use the list of single entry hash tables instead of one hash table to preserve order of inputs.
   #
   class TreeTransformer < Parslet::Transform
-    rule(:hour => simple(:h), :ampm => simple(:ap)) { |dic|
-      convert_time_input_to_minutes(dic[:h].to_i, 0, dic[:ap].to_sym)
+    rule(:hour => simple(:h), :ampm => simple(:ap)) { |dict|
+      convert_time_input_to_minutes(dict[:h].to_i, 0, dict[:ap].to_sym)
     }
-    rule(:hour => simple(:h), :minute => simple(:m), :ampm => simple(:ap))  { |dic|
-      convert_time_input_to_minutes(dic[:h].to_i, dic[:m].to_i, dic[:ap].to_sym)
+    rule(:hour => simple(:h), :minute => simple(:m), :ampm => simple(:ap))  { |dict|
+      convert_time_input_to_minutes(dict[:h].to_i, dict[:m].to_i, dict[:ap].to_sym)
     }
     rule(:closed => simple(:x)) { x.to_sym }
-    rule(:time_from => simple(:f), :time_to => simple(:t)) { |dic| check_starting_time_not_later_than_ending_time(dic[:f], dic[:t]) }
-    rule(:time_range => sequence(:x)) { |dic| check_no_overlap_within_time_periods_for_single_day_range(dic[:x]) }
+    rule(:time_from => simple(:f), :time_to => simple(:t)) { |dict| check_starting_time_not_later_than_ending_time(dict[:f], dict[:t]) }
+    rule(:time_range => sequence(:x)) { |dict| check_no_overlap_within_time_periods_for_single_day_range(dict[:x]) }
     rule(:day => simple(:x)) { WEEKDAY_TO_NUM[x.to_sym]}
     rule(:day_single => simple(:x)) { x..x }
-    rule(:day_range => {:day_from => simple(:f), :day_to => simple(:t)}) { |dic| check_starting_day_not_later_than_ending_day(dic[:f], dic[:t]) }
+    rule(:day_range => {:day_from => simple(:f), :day_to => simple(:t)}) { |dict| check_starting_day_not_later_than_ending_day(dict[:f], dict[:t]) }
     rule(:line_left => simple(:d), :line_right => sequence(:t))  { { d => t} }
     rule(:line_left => simple(:d), :line_right => simple(:c)) { {d => [-1..-1]} }  #for "closed" days
-    rule(:lines => subtree(:x)) { x }
+    rule(:lines => subtree(:x)) { |dict| check_no_overlap_within_day_ranges(dict[:x]) }
 
     private
-    # Convert a time point in a day to the number of minutes passed since midnight.
-    # @param hour [Fixnum] the hour component of time (not in military format)
-    # @param minutes [Fixnum] the minutes component of time
-    # @param am_or_pm [Symbol, :am or :pm]  morning or afternoon
-    # @return [Fixnum] the number of minutes passed since midnight
-    #
-    def self.convert_time_input_to_minutes(hour, minutes, am_or_pm)
-      hour += 12 if am_or_pm == :pm and hour < 12
-      hour = 0 if am_or_pm == :am and hour == 12
-
-      hour * 60 + minutes
-    end
-
     # Make sure the starting time is not later than the ending time.
     # @param starting_time [Fixnum] starting time in minutes passed since midnight
     # @param ending_time [Fixnum] ending time in minutes
@@ -81,6 +68,51 @@ module StoreHours
     # Will raise SemanticError if there is overlap.
     #
     def self.check_no_overlap_within_time_periods_for_single_day_range(periods)
+      if self.ranges_overlap?(periods)
+        raise ::StoreHours::SemanticError.new "incorrect time range specified: overlap for a single day range"
+      end
+
+      periods
+    end
+
+    # For the overall tree, check to make sure that a day integer can only appear once.
+    # @param tree [Array of Hashtable] the already transformed internal data presentation.
+    # @return [Array of Hashtable] the tree passed in will be untouched
+    #
+    # Will raise SemanticError if there is overlap
+    #
+    def self.check_no_overlap_within_day_ranges(tree)
+      # make an array of hashtable keys
+      ranges = []
+      tree.each do |table|
+        ranges << table.keys.first
+      end
+
+      if self.ranges_overlap?(ranges)
+        raise ::StoreHours::SemanticError.new "incorrect day range specified: at last one day appear more than once"
+      end
+
+      tree
+    end
+
+    # Convert a time point in a day to the number of minutes passed since midnight.
+    # @param hour [Fixnum] the hour component of time (not in military format)
+    # @param minutes [Fixnum] the minutes component of time
+    # @param am_or_pm [Symbol, :am or :pm]  morning or afternoon
+    # @return [Fixnum] the number of minutes passed since midnight
+    #
+    def self.convert_time_input_to_minutes(hour, minutes, am_or_pm)
+      hour += 12 if am_or_pm == :pm and hour < 12
+      hour = 0 if am_or_pm == :am and hour == 12
+
+      hour * 60 + minutes
+    end
+
+    # Check whether two or more ranges contain overlaps.
+    # @param periods [Array of Range] list of ranges to be checked against
+    # @return [Boolean] return true if ranges overlap
+    #
+    def self.ranges_overlap?(periods)
       #sort the ranges by range's first item
       sorted_periods = periods.sort {|x, y| x.first <=> y.first }
 
@@ -88,10 +120,11 @@ module StoreHours
       last_index = periods.length - 1
       for i in 1..last_index
         if sorted_periods[i].first <= sorted_periods[i-1].last
-          raise ::StoreHours::SemanticError.new "incorrect time range specified: overlap for a single day range"
+          return true
         end
       end
-      periods
+
+      return false
     end
   end
 end

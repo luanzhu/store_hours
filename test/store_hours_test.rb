@@ -21,9 +21,13 @@ describe StoreHours::StoreHours do
   end
 
   it "should return true for valid text" do
-    text = "mon: 10:00am - 5:00pm mon-fri : 10am-5pm sat - sun: closed sun : closed Sat: 10am - 3:30pm 5pm-11pm"
+    texts = ["mon: 10:00am - 5:00pm", "mon-fri : 10am-5pm sat - sun: closed", "sun : closed Sat: 10am - 3:30pm 5pm-11pm"]
 
-    @h.from_text(text)[0].must_equal true
+    texts.each do |t|
+      r, msg = @h.from_text(t)
+
+      r.must_equal true
+    end
   end
 
   it "should return false for invalid text" do
@@ -106,6 +110,16 @@ describe StoreHours::StoreHours do
     texts = ["mon-fri: 10am-5pm 4pm-10pm", "mon: 10am-5pm 5pm-9pm"]
     texts.each do |t|
       r, msg = @h.from_text(t)
+      r.must_equal false
+    end
+  end
+
+  it "should return false for overlap in the day ranges" do
+    texts = ["mon-fri: 10am-5pm, mon: 6pm-10pm", "mon-fri: 10am-5pm wed:6pm-10pm", "mon-fri: 9am-9pm fri:10pm-11pm"]
+
+    texts.each do |t|
+      r, msg = @h.from_text(t)
+
       r.must_equal false
     end
   end

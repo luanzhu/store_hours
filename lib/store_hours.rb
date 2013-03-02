@@ -7,16 +7,52 @@ require "store_hours/semantic_error"
 
 require "json"
 
-# A very simple parser to parse store hours text. The
-
 module StoreHours
+  # A very simple parser to parse text like
+  #       Mon-Fri:  9AM-5PM
+  #       Sat:      10AM-7PM
+  #       Sun:      closed
+  # and build an internal data structure to enable possible formatting and queries.
   #
+  # This class is designed to use when (1) you like to use a single text field in
+  # database to store open hours, and (2) you would like to be able to check whether
+  # the store opens for a certain time, or to make sure inputs are valid, or to
+  # display the hours in a format different from user input (for example, take plain
+  # text from users, but to format the input with html to display).
+  #
+  # Here is an example about how to use this class in rails. Suppose you have a model
+  # called "Store" with a text filed for business_hours, you can add this validation
+  # method:
+  # TODO: make sure this works
+  #   validate :normal_business_hours_must_be_in_valid_format
+  #   def normal_business_hours_must_be_in_valid_format
+  #     hours_parser = ::StoreHours::StoreHours.new
+  #     #check whether input is valid?
+  #     success, error_message  = hours_parser.from_text(self.normal_business_hours)
+  #     if !success
+  #       #input is not valid
+  #       errors.add(:normal_business_hours, error_message)
+  #     end
+  #   end
+  #
+  # Please refer to text_input_parser.rb and tree_transformer.rb to get some idea
+  # of what kinds of inputs are valid.
   #
   class StoreHours
     def initialize
       @hours = []
     end
 
+    # Try to parse the input text.
+    # @param text [String] store hours text input, case-insensitive
+    # @return [Boolean, String] returns [true, ''] if the text is valid, otherwise,
+    # the return value will be [false, "error message"]
+    #
+    # This method will build the internal data structure for valid text argument.
+    #
+    # Please don't ignore the return value from this method as it is the only way to
+    # know whether input is valid.
+    #
     def from_text(text)
       # Will false if text cannot be parsed
       #
