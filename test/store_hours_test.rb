@@ -124,4 +124,28 @@ describe StoreHours::StoreHours do
     end
   end
 
+  it "should take a block to customize to_text format" do
+    text = "mon-fri: 10am-6pm, 7pm-10pm sat: 1pm-5pm sun: closed"
+
+    r, msg = @h.from_text(text)
+    r.must_equal true
+
+    formatted_text = @h.to_text do |d1, d2, list_of_durations|
+      s = '<tr>'
+
+      s += "<td>#{d1.to_s}"
+      if d2 != d1
+        s += " - #{d2.to_s}"
+      end
+      s += "</td>"
+
+
+
+      s += '</tr>'
+    end
+
+    puts formatted_text
+
+  end
+
 end

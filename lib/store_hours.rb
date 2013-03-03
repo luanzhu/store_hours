@@ -54,16 +54,18 @@ module StoreHours
     # know whether input is valid.
     #
     def from_text(text)
-      # Will false if text cannot be parsed
-      #
-      #
       text = '' if text == nil
       result = true
       error_message = ''
 
       begin
+        # parse the text into an intermediary tree
+        # this call may raise Parslet::ParseFailed exception
         tree = TextInputParser.new.parse(text.strip.downcase)
 
+        # convert the tree into internal data structure
+        # please refer to tree_transformer.rb for the details of this structure
+        # this call may raise StoreHours::SemanticError exception
         @hours = TreeTransformer.new.apply(tree)
 
         result = true
@@ -84,25 +86,28 @@ module StoreHours
       return result, error_message
     end
 
-    # return value is gauratted to be parseablefdfdfdf
+    # This is the method you can use to display store hours consistently.
     def to_text
       text = ''
       @hours.each do |days_table|
         days = days_table.keys.first  #days is the day range, for example, (1..5)
-        text += NUM_TO_WEEKDAY[days.first].to_s
-        text += "-" + NUM_TO_WEEKDAY[days.last].to_s if days.first != days.last
-        text += ": "
+        if block_given?
+          text += yield NUM_TO_WEEKDAY[days.first], NUM_TO_WEEKDAY[days.last], days_table[days]
+        else
+          text += NUM_TO_WEEKDAY[days.first].to_s
+          text += "-" + NUM_TO_WEEKDAY[days.last].to_s if days.first != days.last
+          text += ": "
 
-        days_table[days].each_with_index do |minutes, index|
-          text += ', ' if index > 0
-          if minutes.first == -1  #closed days
-            text += "closed"
-          elsif
-            text += to_time_str(minutes.first) + " - " + to_time_str(minutes.last)
+          days_table[days].each_with_index do |minutes, index|
+            text += ', ' if index > 0
+            if minutes.first == -1  #closed days
+              text += "closed"
+            elsif
+              text += to_time_str(minutes.first) + " - " + to_time_str(minutes.last)
+            end
           end
+          text += "\n"
         end
-
-        text += "\n"
       end
 
       text.strip

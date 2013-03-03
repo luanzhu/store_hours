@@ -113,10 +113,10 @@ module StoreHours
     # @return [Boolean] return true if ranges overlap
     #
     def self.ranges_overlap?(periods)
-      #sort the ranges by range's first item
+      # sort the ranges by range's first item
       sorted_periods = periods.sort {|x, y| x.first <=> y.first }
 
-      #starts from the second item
+      # starts from the second item
       last_index = periods.length - 1
       for i in 1..last_index
         if sorted_periods[i].first <= sorted_periods[i-1].last
