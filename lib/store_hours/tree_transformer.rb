@@ -2,6 +2,7 @@ require 'parslet'
 
 require 'store_hours/constants'
 require 'store_hours/semantic_error'
+require 'store_hours/common_methods'
 
 module StoreHours
   # Convert the intermediary tree resulted from parser to the internal data structure in the format of
@@ -17,10 +18,10 @@ module StoreHours
   #
   class TreeTransformer < Parslet::Transform
     rule(:hour => simple(:h), :ampm => simple(:ap)) { |dict|
-      convert_time_input_to_minutes(dict[:h].to_i, 0, dict[:ap].to_sym)
+      ::StoreHours::convert_time_input_to_minutes(dict[:h].to_i, 0, dict[:ap].to_sym)
     }
     rule(:hour => simple(:h), :minute => simple(:m), :ampm => simple(:ap))  { |dict|
-      convert_time_input_to_minutes(dict[:h].to_i, dict[:m].to_i, dict[:ap].to_sym)
+      ::StoreHours::convert_time_input_to_minutes(dict[:h].to_i, dict[:m].to_i, dict[:ap].to_sym)
     }
     rule(:closed => simple(:x)) { x.to_sym }
     rule(:time_from => simple(:f), :time_to => simple(:t)) { |dict| check_starting_time_not_later_than_ending_time(dict[:f], dict[:t]) }
@@ -93,19 +94,6 @@ module StoreHours
       end
 
       tree
-    end
-
-    # Convert a time point in a day to the number of minutes passed since midnight.
-    # @param hour [Fixnum] the hour component of time (not in military format)
-    # @param minutes [Fixnum] the minutes component of time
-    # @param am_or_pm [Symbol, :am or :pm]  morning or afternoon
-    # @return [Fixnum] the number of minutes passed since midnight
-    #
-    def self.convert_time_input_to_minutes(hour, minutes, am_or_pm)
-      hour += 12 if am_or_pm == :pm and hour < 12
-      hour = 0 if am_or_pm == :am and hour == 12
-
-      hour * 60 + minutes
     end
 
     # Check whether two or more ranges contain overlaps.

@@ -4,6 +4,7 @@ require "store_hours/version"
 require "store_hours/text_input_parser"
 require "store_hours/tree_transformer"
 require "store_hours/semantic_error"
+require "store_hours/common_methods"
 
 require "json"
 
@@ -103,7 +104,7 @@ module StoreHours
             if minutes.first == -1  #closed days
               text += "closed"
             elsif
-              text += to_time_str(minutes.first) + " - " + to_time_str(minutes.last)
+              text += ::StoreHours::from_minutes_to_time_str(minutes.first) + " - " + ::StoreHours::from_minutes_to_time_str(minutes.last)
             end
           end
           text += "\n"
@@ -132,16 +133,9 @@ module StoreHours
       return false
     end
 
-    private
-    def to_time_str(t)
-      hour_part = t / 60
-      minute_part = t % 60
-
-      am_or_pm = (hour_part >= 12 ? 'PM' : 'AM')
-      hour_part = hour_part - 12 if hour_part >= 13
-
-      "#{ hour_part }:#{ format('%02d', minute_part) }#{ am_or_pm }"
-    end
 
   end
+
+
+
 end

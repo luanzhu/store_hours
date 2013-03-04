@@ -137,14 +137,24 @@ describe StoreHours::StoreHours do
       if d2 != d1
         s += " - #{d2.to_s}"
       end
+      s += ":"
       s += "</td>"
 
+      s += "<td>"
+      list_of_durations.each_with_index do |r, index|
+        if index > 0
+          s += " "
+        end
+        s += StoreHours::from_minutes_to_time_str(r.first)
+        s += "-"
+        s += StoreHours::from_minutes_to_time_str(r.last)
+      end
+      s += "</td>"
 
-
-      s += '</tr>'
+      s += "</tr>"
     end
 
-    puts formatted_text
+    formatted_text.must_equal "<tr><td>Mon - Fri:</td><td>10:00AM-6:00PM 7:00PM-10:00PM</td></tr><tr><td>Sat:</td><td>1:00PM-5:00PM</td></tr><tr><td>Sun:</td><td>-1:59AM--1:59AM</td></tr>"
 
   end
 
