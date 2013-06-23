@@ -38,6 +38,7 @@ Examples of valid input:
     sun : closed
     
 Examples of invalid entries:
+
     mon  10am - 5pm           # colon(:) after week day(s) is required
     mon fri: 10am - 5pm       # dash(-) between two days is required
     mon-fri: 10:am - 5pm      # minute component for time is required when the colon(:) is present
