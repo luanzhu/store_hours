@@ -22,9 +22,9 @@ module StoreHours
   # text from users, but to format the input with html to display).
   #
   # Here is an example about how to use this class in rails. Suppose you have a model
-  # called "Store" with a text filed for business_hours, you can add this validation
+  # called "Store" with a text filed named normal_business_hours, you can add this validation
   # method:
-  # TODO: make sure this works
+  # 
   #   validate :normal_business_hours_must_be_in_valid_format
   #   def normal_business_hours_must_be_in_valid_format
   #     hours_parser = ::StoreHours::StoreHours.new
@@ -87,7 +87,7 @@ module StoreHours
       return result, error_message
     end
 
-    # This is the method you can use to display store hours consistently.
+    # This is the method you can use to display store hours.
     def to_text
       text = ''
       @hours.each do |days_table|
