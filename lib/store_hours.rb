@@ -19,7 +19,7 @@ module StoreHours
   # database to store open hours, and (2) you would like to be able to check whether
   # the store opens for a certain time, or to make sure inputs are valid, or to
   # display the hours in a format different from user input (for example, take plain
-  # text from users, but to format the input with html to display).
+  # text from users, but to format the input in html to display).
   #
   # Here is an example about how to use this class in rails. Suppose you have a model
   # called "Store" with a text filed named normal_business_hours, you can add this validation
@@ -84,7 +84,7 @@ module StoreHours
         error_message = e.message
       end
 
-      return result, error_message
+      return [result, error_message]
     end
 
     # This is the method you can use to display store hours.

@@ -5,10 +5,10 @@ A very simple parser to parse text like
     Mon-Fri:  9AM-5PM
     Sat:      10AM-7PM
     Sun:      closed
-    
+
 and build an internal data structure to enable possible formatting and queries.
 
-This class is designed for situations where (1) you like to use a single text field in database to store open hours, and (2) you would like to be able to check whether the store opens for a certain time, or to make sure inputs are valid, or to display the hours in a format different from user input (for example, take plain text from users, but to format the input with html to display).
+This class is designed for situations where (1) you like to use a single text field in database to store open hours, and (2) you would like to be able to check whether the store opens for a certain time, or to make sure inputs are valid, or to display the hours in a format different from user input (for example, format the input in html to display on website).
 
 Here is an example about how to use this class in rails. Suppose you have a model
 called "Store" with a text filed named normal_business_hours, you can add this validation
@@ -47,6 +47,23 @@ Examples of invalid entries:
     mon-fri: 10 am - 5 pm     # no space is allowed between time digits and am/pm
     mon : 10am - 17           # standard time format (with am or pm) is required
     sat-sun: 10am-1pm closed  # closed can only be used with other time periods
+
+## Usage
+
+```
+#!ruby
+1.9.3-p194 :001 > require 'store_hours'
+ => true 
+1.9.3-p194 :002 > hours_parser = ::StoreHours::StoreHours.new
+ => #<StoreHours::StoreHours:0x007fb5dc1bead8 @hours=[]> 
+1.9.3-p194 :003 > hours_parser.from_text('mon:10:40am-5pm tue:8am-')
+ => [false, "syntax error: input is not in correct format"] 
+1.9.3-p194 :004 > hours_parser.from_text('mon:10:40am-5pm tue:8am-6pm')
+ => [true, ""] 
+1.9.3-p194 :006 > puts hours_parser.to_text
+Mon: 10:40AM - 5:00PM
+Tue: 8:00AM - 6:00PM
+```
 
 ## Limitations
 
