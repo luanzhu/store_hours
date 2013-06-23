@@ -1,9 +1,11 @@
 # StoreHours
 
 A very simple parser to parse text like
+
     Mon-Fri:  9AM-5PM
     Sat:      10AM-7PM
     Sun:      closed
+    
 and build an internal data structure to enable possible formatting and queries.
 
 This class is designed for situations where (1) you like to use a single text field in database to store open hours, and (2) you would like to be able to check whether the store opens for a certain time, or to make sure inputs are valid, or to display the hours in a format different from user input (for example, take plain text from users, but to format the input with html to display).
@@ -48,7 +50,7 @@ Examples of invalid entries:
 
 ## Limitations
 
-Time periods can be within 0AM-11:59PM.  In other words, time periods like 11:30PM-6:00AM is not supported.
+Time periods can only be within 0AM-11:59PM.  In other words, time periods like 11:30PM-6:00AM are not supported.
 
 ## Installation
 
