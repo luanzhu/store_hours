@@ -63,7 +63,10 @@ Examples of invalid entries:
 1.9.3-p194 :006 > puts hours_parser.to_text
 Mon: 10:40AM - 5:00PM
 Tue: 8:00AM - 6:00PM
-1.9.3-p194 :007 > hours_parser
+1.9.3-p194 :007 > puts hours_parser.to_text.gsub("\n","<br/>")
+Mon: 10:40AM - 5:00PM<br/>Tue: 8:00AM - 6:00PM
+ => nil 
+1.9.3-p194 :008 > hours_parser
  => #<StoreHours::StoreHours:0x007fb5dc1bead8 @hours=[{1..1=>[640..1020]}, {2..2=>[480..1080]}]> 
 ```
 
