@@ -46,7 +46,7 @@ Examples of invalid entries:
     mon-fri: 10:am - 5pm      # minute component for time is required when the colon(:) is present
     mon-fri: 10 am - 5 pm     # no space is allowed between time digits and am/pm
     mon : 10am - 17           # standard time format (with am or pm) is required
-    sat-sun: 10am-1pm closed  # closed can only be used with other time periods
+    sat-sun: 10am-1pm closed  # closed cannot be used with other time periods
 
 ## Usage
 
